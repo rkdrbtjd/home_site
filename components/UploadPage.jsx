@@ -190,18 +190,16 @@ const UploadPage = () => {
                   : "○○빌라 / 150만원 / 바로입주"}
               </div>
 
+              {/* 기존 editor-placeholder 블록은 삭제하고 textarea만 둡니다 */}
               <div className="editor">
-                <div className="editor-placeholder">
-                  <strong>글쓰기</strong>
-                  <span> / 고객과의 컨택을 위한 연락처를 남겨주세요!</span>
-                </div>
                 <textarea
                   className="editor-area"
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
+                  placeholder="글쓰기 / 고객과의 컨택을 위한 연락처를 남겨주세요!"
                 />
               </div>
-
+              
               <div className="bottom-actions">
                 <div className="pin-wrap">
                   <label className="pin-label">PIN</label>
