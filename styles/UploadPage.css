@@ -220,13 +220,36 @@
 
 .upload-page .summary.summary--form { text-align: center; font-size: 18px; margin-bottom: 22px; }
 
-.upload-page .editor { margin-top: 18px; }
-.upload-page .editor-placeholder { text-align:center; color:#c7c7c7; margin-bottom:6px; }
-.upload-page .editor-placeholder strong { font-weight:700; }
-.upload-page .editor-area {
-  width:100%; min-height:140px; border:none; border-radius:12px;
-  background:transparent; outline:none; font-size:16px; line-height:1.6; padding:8px 2px; resize:vertical;
+/* 에디터 박스 */
+.upload-page .editor {
+  margin-top: 18px;
 }
+
+/* 텍스트 영역 기본 스타일 */
+.upload-page .editor-area {
+  width: 100%;
+  min-height: 160px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  outline: none;
+  font-size: 18px;
+  line-height: 1.6;
+  padding: 10px 4px;
+  resize: vertical;
+  text-align: left;          /* 입력 시에는 왼쪽 정렬 */
+}
+
+/* placeholder(설명) */
+.upload-page .editor-area::placeholder {
+  color: #c7c7c7;
+}
+
+/* placeholder가 보일 때만 가운데 정렬(설명 문구를 중앙에) */
+.upload-page .editor-area:placeholder-shown {
+  text-align: center;
+}
+
 
 /* PIN + 업로드 버튼 (우측 정렬) */
 .upload-page .bottom-actions {
