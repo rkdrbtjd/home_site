@@ -128,7 +128,7 @@ const TransferPage = () => {
           More +
         </button>
 
-        {/* 숙박 리스트 */}
+        {/* 양도 리스트 */}
          <div className="lodging-list">
           {visibleList.map((text, i) => (
             <div
@@ -156,3 +156,4 @@ const TransferPage = () => {
 };
 
 export default TransferPage;
+
