@@ -41,13 +41,15 @@ const LodgingPage = () => {
   const PAGE_SIZE = 6;
   const [visible, setVisible] = useState(PAGE_SIZE);
 
-  // ✅ lodgingList 대신 LODGING_LIST 사용
-  const visibleList = useMemo(
-    () => LODGING_LIST.slice(0, visible),
-    [visible]
-  );
-
+  const visibleList = useMemo(() => LODGING_LIST.slice(0, visible), [visible]);
   const canLoadMore = visible < LODGING_LIST.length;
+
+  // ✅ 상세로 이동 (state로 이미지/요약 전달)
+  const goDetail = (summary) => {
+    navigate("/detaillodging", {
+      state: { img: roomImg, summary },
+    });
+  };
 
   return (
     <div className="screen">
@@ -107,14 +109,27 @@ const LodgingPage = () => {
                 <TagGroup />
 
         {/* 숙박 리스트 */}
-        <div className="lodging-list">
+         <div className="lodging-list">
           {visibleList.map((text, i) => (
-            <div className="lodging-card" key={i}>
+            <div
+              key={i}
+              className="lodging-card"
+              role="button"
+              tabIndex={0}
+              onClick={() => goDetail(text)}
+              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && goDetail(text)}
+            >
               <img src={roomImg} alt="숙박" className="lodging-image" />
               <div className="lodging-text">{text}</div>
             </div>
           ))}
         </div>
+
+        {canLoadMore && (
+          <div className="more-btn" onClick={() => setVisible((v) => v + PAGE_SIZE)}>
+            More +
+          </div>
+        )}
 
         {/* More 버튼 */}
         {canLoadMore && (
