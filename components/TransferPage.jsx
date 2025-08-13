@@ -50,6 +50,13 @@ const TransferPage = () => {
   const extraRows = Math.max(0, rows - 2);
   const footerTop = baseFooterTop + extraRows * rowHeight;
 
+    // ✅ 상세로 이동 (state로 이미지/요약 전달)
+  const goDetail = (summary) => {
+    navigate("/detailtransfer", {
+      state: { img: roomImg, summary },
+    });
+  };
+
   return (
     <div className="screen transfer-page">{/* ✨ 스코프 클래스 */}
       <div className="container">
@@ -83,6 +90,7 @@ const TransferPage = () => {
               <p className="summary-text">your home at a glance,</p>
             </div>
           <TagGroup />
+        
 
         {/* 카테고리 버튼 */}
         <div className="category-wrapper">
@@ -120,15 +128,22 @@ const TransferPage = () => {
           More +
         </button>
 
-        {/* 리스트 */}
-        <div className="listing-grid">
+        {/* 숙박 리스트 */}
+         <div className="lodging-list">
           {visibleList.map((text, i) => (
-            <div className="listing-card" key={i}>
-              <img src={roomImg} alt="양도" className="listing-image" />
-              <div className="listing-text">{text}</div>
+            <div
+              key={i}
+              className="lodging-card"
+              role="button"
+              tabIndex={0}
+              onClick={() => goDetail(text)}
+              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && goDetail(text)}
+            >
+              <img src={roomImg} alt="양도" className="lodging-image" />
+              <div className="lodging-text">{text}</div>
             </div>
           ))}
-        </div>
+        </div> 
 
         {/* 푸터 */}
         <div className="footer-text" style={{ top: `${footerTop}px` }}>
