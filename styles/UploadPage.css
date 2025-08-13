@@ -211,7 +211,7 @@
 /* 요약 라인은 그대로 가운데 정렬 */
 .upload-page .summary.summary--form {
   text-align: center;
-  font-size: 18px;
+  font-size: 20px;
   margin-top: 12px;
   margin-bottom: 0;
 }
