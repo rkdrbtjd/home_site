@@ -159,7 +159,7 @@ const DetailLodging = () => {
         </section>
       <div className="footer-text">
           FIT ROOM<br />
-          <span className="footer-sub">_Finding<br /> a house that suits me</span>
+          <span className="footer-sub">_Finding a house that suits me</span>
         </div>  
       </div>
     </div>
