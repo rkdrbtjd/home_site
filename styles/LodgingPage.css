@@ -1,107 +1,123 @@
-@import url('./mainpage.css');
+/* 메인과 충돌 방지: 페이지 스코프 .lodging-page 사용 */
+.lodging-page { position: relative; }
 
-/* =========================
-   카테고리 (메인 CSS와 충돌 해결)
-   ========================= */
-.category-wrapper {
+/* ===== 🔎 우측 상단 검색(메인페이지 동일 스타일) ===== */
+.lodging-page .top-search {
+  position: absolute;
+  top: 58px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 5;
+}
+.lodging-page .top-search__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #000;
+  background: #000;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+}
+.lodging-page .top-search__toggle svg { color: #fff; }
+.lodging-page .top-search__label { line-height: 1; }
+
+.lodging-page .top-search__form {
+  width: 0;
+  overflow: hidden;
+  transition: width .25s ease, border-bottom-color .25s ease;
+  border-bottom: 1px solid transparent;
+}
+.lodging-page .top-search__form.is-open {
+  width: 280px;
+  border-bottom: 1px solid #000;
+}
+.lodging-page .top-search__input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  padding: 4px 2px 6px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lodging-page .top-search__form { transition: none; }
+}
+
+/* ===== 카테고리 ===== */
+.lodging-page .category-wrapper {
   position: absolute;
   top: 684px;
   left: 87px;
   display: flex;
-  gap: 100px;
-  z-index: 2; /* 헤더/이미지와 겹침 방지 */
+  gap: 120px;
+  z-index: 2;
 }
-
-/* mainpage.css 의 .category-card { position:absolute } 무력화 */
-.category-wrapper .category-card {
-  position: static !important; /* ✨ 중요: 절대배치 해제 */
-  width: 287px;
-  height: 302px;
+.lodging-page .category-card {
+  position: static !important;
+  width: 287px; height: 302px;
   border-radius: 88px;
   text-align: center;
-  background-color: #E5E5E5; /* 기본색(양도/AI) */
+  background-color: #E5E5E5;
   cursor: pointer;
-  transition: transform 0.2s ease;
-  border: 1.5px solid #000; /* 피그마 느낌 */
-}
-
-.category-wrapper .category-card.active {
-  background-color: #D4E4E1; /* 숙박 활성화색 */
-}
-
-.category-wrapper .category-card:hover {
-  transform: scale(1.05);
-}
-
-.category-wrapper .category-image {
-  margin-top: 82px;
-  width: 110px;
-  height: 110px;
-  object-fit: contain;
-}
-
-.category-wrapper .category-label {
-  margin-top: 10px;
-  font-size: 24px;
-  letter-spacing: 3.36px;
-  font-family: "Inter", sans-serif;
-}
-
-/* 태그 그룹 */
-.tag-group {
-  position: absolute;
-  top: 575px;
-  left: 845px;
-  display: flex;
-  gap: 8px;
-}
-
-.tag {
-  padding: 6px 16px;
-  font-size: 14px;
-  font-family: "Inter", sans-serif;
-  border-radius: 38px;
-  white-space: nowrap;
-}
-
-.tag-outline {
+  transition: transform .2s ease;
   border: 1.5px solid #000;
 }
-
-.tag-outline-white {
-  border: 1.5px solid #000;
-  background-color: #fff;
+.lodging-page .category-card:hover { transform: scale(1.05); }
+.lodging-page .category-card.active { background-color: #D4E4E1; }
+.lodging-page .category-image {
+  margin-top: 82px; width: 110px; height: 110px; object-fit: contain;
 }
+.lodging-page .category-label { margin-top: 10px; font-size: 24px; letter-spacing: 3.36px; font-family: "Inter", sans-serif; }
 
-.tag-filled {
-  background-color: #000;
-  color: #fff;
-}
-
-/* =========================
-   필터 + More
-   ========================= */
-.filter-buttons {
+/* ===== 필터 바 ===== */
+.lodging-page .filter-bar {
   position: absolute;
   top: 1060px;
   left: 87px;
   display: flex;
   gap: 10px;
+  align-items: center;
   z-index: 2;
+  flex-wrap: wrap;
 }
 
-.filter-buttons button {
+.lodging-page .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   border: 1.5px solid #000;
   border-radius: 38px;
-  padding: 6px 20px;
-  font-size: 14px;
-  font-family: "Inter", sans-serif;
+  padding: 6px 14px;
   background: #fff;
-  cursor: pointer;
+  font-family: "Inter", sans-serif;
 }
+.lodging-page .chip input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  width: 90px;               /* ✅ 금액 범위 2칸 대응 (기존 120 → 90) */
+}
+.lodging-page .chip .chip-label { font-size: 14px; }
+.lodging-page .chip.date-chip input { width: 145px; }
+.lodging-page .chip .tilde { opacity: .6; }
+.lodging-page .chip .won { font-size: 13px; opacity: .8; }
 
-/* 우측 상단 More+ */
-.more-btn {
+.lodging-page .clear-chip {
+  cursor: pointer;
+  transition: opacity .15s ease;
+}
+.lodging-page .clear-chip:hover { opacity: .7; }
+
+/* ===== More 버튼 ===== */
+.lodging-page .more-btn {
   position: absolute;
   top: 1060px;
   right: 80px;
@@ -114,11 +130,10 @@
   cursor: pointer;
   z-index: 2;
 }
+.lodging-page .more-btn.disabled { opacity: .4; pointer-events: none; cursor: default; }
 
-/* =========================
-   숙박 리스트
-   ========================= */
-.lodging-list {
+/* ===== 숙박 리스트 ===== */
+.lodging-page .lodging-list {
   position: absolute;
   top: 1120px;
   left: 87px;
@@ -127,43 +142,27 @@
   gap: 40px;
   z-index: 1;
 }
+.lodging-page .lodging-card { text-align: center; }
+.lodging-page .lodging-image {
+  width: 287px; height: 302px; object-fit: cover;
+  border-radius: 49px; background: rgba(72, 72, 72, 0.35);
+}
+.lodging-page .lodging-text { margin-top: 8px; font-size: 16px; font-family: "Inter", sans-serif; }
 
-.lodging-card {
+.lodging-page .empty {
+  grid-column: 1 / -1;
   text-align: center;
-}
-
-.lodging-image {
-  width: 287px;
-  height: 302px;
-  object-fit: cover;
-  border-radius: 49px;
-  background: rgba(72, 72, 72, 0.35);
-}
-
-.lodging-text {
-  margin-top: 8px;
-  font-size: 16px;
+  padding: 24px 0;
+  color: #666;
   font-family: "Inter", sans-serif;
 }
 
-/* =========================
-   푸터 (카드와 겹침 방지)
-   ========================= */
-/* 메인 css의 absolute 위치가 너무 빨라서 겹쳤음 → 더 아래로 내림 */
-.footer-text {
-  position: absolute;
-  top: 1960px;   /* 1667px → 1960px로 내려 카드 2행과 간격 확보 */
+/* ===== 푸터 ===== */
+.lodging-page .footer-text {
+  position: absolute;       /* ✅ 절대배치 유지 (상단 고정 구조와 어울리게) */
   left: 543px;
   text-align: center;
-  font-size: 24px;
-  letter-spacing: 3.36px;
+  font-size: 24px; letter-spacing: 3.36px;
   font-family: "Inter", sans-serif;
 }
-
-.footer-sub {
-  font-size: 12px;
-  line-height: 1.3;
-}
-
-.more-btn { cursor: pointer; }
-.more-btn.disabled { opacity: .4; pointer-events: none; cursor: default; }
+.lodging-page .footer-sub { font-size: 12px; line-height: 1.3; }
