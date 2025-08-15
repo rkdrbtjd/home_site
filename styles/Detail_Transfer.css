@@ -43,7 +43,7 @@
 
 
 /* 우측 상단 컨트롤: 버튼만 */
-.detail-transfer.controls {
+.detail-transfer .controls {
   position: absolute; top: -50px; right: -100px;
   display: inline-flex; align-items: center; gap: 8px;
 }
@@ -174,12 +174,20 @@
   .detail-lodging .photo-card { max-width: 100%; }
 }
 
-/* 푸터 */
-.detail-transfer .footer {
-  position: absolute; bottom: -200px; left: 50%; transform: translateX(-50%);
-  text-align: center; font-family: "Inter", sans-serif; font-size: 24px; letter-spacing: 3.36px;
+.detail-transfer .footer-text {
+  position: absolute;
+  top: 1500px;
+  left: 543px;
+  text-align: center;
+  font-size: 24px;
+  letter-spacing: 3.36px;
+  font-family: "Inter", sans-serif;
 }
-.detail-transfer .footer-sub { font-size: 12px; }
+
+.detail-transfer .footer-sub {
+  font-size: 12px;
+  line-height: 1.3;
+}
 
 
 
