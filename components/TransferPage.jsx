@@ -1,56 +1,89 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/TransferPage.css";               // ✨ 전용 CSS
-import house from "../image/house.png";
-import search from "../image/search.png";
+import Header from "./Header";
+import "../styles/TransferPage.css";
 import lodgingImg from "../image/image19.png";
 import transferImg from "../image/image21.png";
 import chatbotImg from "../image/image32.png";
 import roomImg from "../image/room-sample.png";
 
-// 더미 데이터 (원하면 API로 대체)
+// ✅ 더미 데이터(필요 시 API로 교체)
 const TRANSFER_LIST = [
   "대곡빌라 / 150만원 / 바로입주",
-  "대곡빌라 / 150만원 / 바로입주",
-  "대곡빌라 / 150만원 / 바로입주",
-  "대곡빌라 / 150만원 / 바로입주",
-  "대곡빌라 / 150만원 / 바로입주",
-  "대곡빌라 / 150만원 / 바로입주",
-  "대곡빌라 / 150만원 / 바로입주",
+  "강남오피스텔 / 90만원 / 2월입주",
+  "판교원룸 / 85만원 / 3월입주",
+  "신림빌라 / 70만원 / 즉시입주",
+  "광교타워 / 110만원 / 협의",
+  "잠실오피스텔 / 95만원 / 2월입주",
+  "마포원룸 / 82만원 / 3월입주",
+  "용산빌라 / 120만원 / 협의",
+  "연남동투룸 / 140만원 / 즉시입주",
+  "서초오피스텔 / 100만원 / 2월입주",
 ];
-
-  export const TagGroup = () => (
-    <div className="tag-group">
-      <div className="tag tag-outline" style={{ transform: "rotate(-6.33deg)" }}>
-        short_term
-      </div>
-      <div className="tag tag-outline-white" style={{ transform: "rotate(2.37deg)" }}>
-        to long-term
-      </div>
-      <div className="tag tag-filled" style={{ transform: "rotate(-5.35deg)" }}>
-        rentals!
-      </div>
-    </div>
-  );
 
 const TransferPage = () => {
   const navigate = useNavigate();
 
-  // More+ 로직
+  // ====== 🔎 메인페이지와 동일한 검색 상태/로직 ======
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const inputRef = useRef(null);
+  const searchBtnRef = useRef(null);
+
+  const toggleSearch = () => {
+    setSearchOpen((v) => {
+      const next = !v;
+      setTimeout(() => next && inputRef.current?.focus(), 0);
+      return next;
+    });
+  };
+  const submitSearch = () => {
+    const q = query.trim();
+    navigate(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
+  };
+
+  useEffect(() => {
+    const onDocMouseDown = (e) => {
+      if (!searchOpen) return;
+      const form = document.getElementById("transferpage-top-search-form");
+      if (!form?.contains(e.target) && !searchBtnRef.current?.contains(e.target)) {
+        setSearchOpen(false);
+        searchBtnRef.current?.focus();
+      }
+    };
+    document.addEventListener("mousedown", onDocMouseDown);
+    return () => document.removeEventListener("mousedown", onDocMouseDown);
+  }, [searchOpen]);
+
+  // ===== More+ 로직 =====
   const PAGE_SIZE = 6;
   const [visible, setVisible] = useState(PAGE_SIZE);
   const visibleList = useMemo(() => TRANSFER_LIST.slice(0, visible), [visible]);
   const canLoadMore = visible < TRANSFER_LIST.length;
   const handleMore = () => setVisible(v => Math.min(v + PAGE_SIZE, TRANSFER_LIST.length));
 
-  // 푸터 보정(절대배치 환경)
-  const baseFooterTop = 1667;
-  const rowHeight = 370;
-  const rows = Math.ceil(visible / 3);
-  const extraRows = Math.max(0, rows - 2);
-  const footerTop = baseFooterTop + extraRows * rowHeight;
+  // ===== 푸터 자동 위치 보정 =====
+  const listRef = useRef(null);
+  const [footerTop, setFooterTop] = useState(1667);
 
-    // ✅ 상세로 이동 (state로 이미지/요약 전달)
+  useEffect(() => {
+    const calcFooter = () => {
+      const el = listRef.current;
+      if (!el) return;
+      const top = el.offsetTop || 0;
+      const height = el.offsetHeight || 0;
+      const margin = 60;
+      setFooterTop(top + height + margin);
+    };
+    calcFooter();
+    const imgs = listRef.current?.querySelectorAll("img") || [];
+    imgs.forEach(img => { if (!img.complete) img.addEventListener("load", calcFooter, { once: true }); });
+    window.addEventListener("resize", calcFooter);
+    const id = setTimeout(calcFooter, 0);
+    return () => { window.removeEventListener("resize", calcFooter); clearTimeout(id); };
+  }, [visibleList.length]);
+
+      // ✅ 상세로 이동 (state로 이미지/요약 전달)
   const goDetail = (summary) => {
     navigate("/detailtransfer", {
       state: { img: roomImg, summary },
@@ -58,67 +91,65 @@ const TransferPage = () => {
   };
 
   return (
-    <div className="screen transfer-page">{/* ✨ 스코프 클래스 */}
-      <div className="container">
-        {/* 검색 버튼 */}
-        <div
-          className="search-button"
-          role="button"
-          tabIndex={0}
-          onClick={() => navigate("/search")}
-        >
-          <div className="search-label">Let’s search!</div>
+    <div className="screen">
+      <div className="container transfer-page">
+        {/* 🔎 우측 상단 검색(메인과 동일) */}
+        <div className="top-search">
+          <button
+            ref={searchBtnRef}
+            className="top-search__toggle"
+            onClick={toggleSearch}
+            aria-expanded={searchOpen}
+            aria-controls="transferpage-top-search-form"
+            type="button"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" fill="none" />
+              <line x1="16.5" y1="16.5" x2="22" y2="22" stroke="currentColor" strokeWidth="2" />
+            </svg>
+            <span className="top-search__label">검색</span>
+          </button>
+
+          <form
+            id="transferpage-top-search-form"
+            role="search"
+            className={`top-search__form ${searchOpen ? "is-open" : ""}`}
+            aria-hidden={!searchOpen}
+            onSubmit={(e) => { e.preventDefault(); submitSearch(); }}
+          >
+            <input
+              ref={inputRef}
+              className="top-search__input"
+              placeholder="원룸/건물명 검색"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              aria-label="검색어 입력"
+              tabIndex={searchOpen ? 0 : -1}
+              onKeyDown={(e) => e.key === "Escape" && setSearchOpen(false)}
+            />
+          </form>
         </div>
-        <img
-          src={search}
-          alt="search"
-          className="search-icon"
-          onClick={() => navigate("/search")}
-        />
 
-        {/* 헤더 */}
-        <div className="header">
-          <h1 className="main-title">
-            FIT ROOM<br />_Finding<br /> a house that suits me
-          </h1>
-          <img src={house} alt="house" className="house-image" />
-        </div>
+        {/* ✅ 공용 헤더 */}
+        <Header />
 
-        {/* 요약/태그 */}
-          <div className="summary-box">
-            <div className="summary-check">Check out</div>
-              <p className="summary-text">your home at a glance,</p>
-            </div>
-          <TagGroup />
-        
-
-        {/* 카테고리 버튼 */}
+        {/* 카테고리 3개 (양도 활성) */}
         <div className="category-wrapper">
           <div className="category-card" onClick={() => navigate("/lodging")}>
             <img src={lodgingImg} alt="숙박" className="category-image" />
             <div className="category-label">숙박</div>
           </div>
-
-          {/* ✨ 양도만 활성화 색상 */}
           <div className="category-card active" onClick={() => navigate("/transfer")}>
             <img src={transferImg} alt="양도" className="category-image" />
             <div className="category-label">양도</div>
           </div>
-
           <div className="category-card" onClick={() => navigate("/upload")}>
             <img src={chatbotImg} alt="업로드" className="category-image" />
             <div className="category-label">업로드</div>
           </div>
         </div>
 
-        {/* 필터 */}
-        <div className="filter-buttons">
-          <button>건물명</button>
-          <button>날짜</button>
-          <button>금액</button>
-        </div>
-
-        {/* More+ */}
+        {/* More 버튼 */}
         <button
           type="button"
           className={`more-btn ${canLoadMore ? "" : "disabled"}`}
@@ -128,22 +159,18 @@ const TransferPage = () => {
           More +
         </button>
 
-        {/* 양도 리스트 */}
-         <div className="lodging-list">
+        <div className="transfer-list" ref={listRef}>
           {visibleList.map((text, i) => (
-            <div
-              key={i}
-              className="lodging-card"
-              role="button"
-              tabIndex={0}
-              onClick={() => goDetail(text)}
-              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && goDetail(text)}
-            >
-              <img src={roomImg} alt="양도" className="lodging-image" />
-              <div className="lodging-text">{text}</div>
-            </div>
-          ))}
-        </div> 
+          <div
+            className="transfer-card"
+            key={i}
+            onClick={() => goDetail(text)} // ✅ 상세 페이지 이동
+          >
+        <img src={roomImg} alt="양도" className="transfer-image" />
+          <div className="transfer-text">{text}</div>
+        </div>
+        ))}
+        </div>
 
         {/* 푸터 */}
         <div className="footer-text" style={{ top: `${footerTop}px` }}>
@@ -156,4 +183,3 @@ const TransferPage = () => {
 };
 
 export default TransferPage;
-
