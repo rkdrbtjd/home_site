@@ -1,11 +1,82 @@
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import house from "../image/house.png";
 import "../styles/Detail_Lodging.css";
 
+/** 네이버 스크립트 로더 */
+function useNaverScript(clientId) {
+  const [ready, setReady] = useState(!!window.naver?.maps);
+
+  useEffect(() => {
+    if (window.naver?.maps) {
+      setReady(true);
+      return;
+    }
+    if (!clientId) {
+      console.warn("REACT_APP_NAVER_MAP_ID 가 설정되지 않았습니다.");
+      return;
+    }
+
+    const el = document.createElement("script");
+    // 가이드 버전 URL
+    el.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}&submodules=geocoder`;
+    el.async = true;
+    el.onload = () => {
+      console.log("[NAVER] script loaded:", !!window.naver);
+      setReady(true);
+    };
+    el.onerror = () => console.error("Naver Maps 스크립트 로딩 실패(리퍼러/키 확인)");
+    document.head.appendChild(el);
+  }, [clientId]);
+
+  return ready;
+}
+
+/** 지도 컴포넌트 */
+function NaverMap({ lat, lng, zoom = 16, style }) {
+  const mapRef = useRef(null);
+  const ncpClientId = process.env.REACT_APP_NAVER_MAP_ID;
+  console.log("[NAVER] ncpClientId:", ncpClientId);
+  const ready = useNaverScript(ncpClientId);
+
+  useEffect(() => {
+    if (!ready || !mapRef.current) return;
+    const { naver } = window;
+    if (!naver?.maps) {
+      console.error("[NAVER] naver.maps 없음");
+      return;
+    }
+
+    // 가이드 방식
+    const position = new naver.maps.LatLng(lat, lng);
+    const map = new naver.maps.Map(mapRef.current, {
+      center: position,
+      zoom,
+    });
+
+    new naver.maps.Marker({
+      position,
+      map,
+    });
+  }, [ready, lat, lng, zoom]);
+
+  return (
+    <div
+      ref={mapRef}
+      style={{
+        width: "100%",
+        height: 530,
+        borderRadius: 16,
+        border: "1px solid #e5e5e5",
+        ...style,
+      }}
+    />
+  );
+}
+
 const DetailLodging = () => {
-  const navigate = useNavigate();       // ✅ 컴포넌트 최상위에서 호출
-  const { state } = useLocation();      // LodgingPage에서 넘긴 { img, summary }
+  const navigate = useNavigate();
+  const { state } = useLocation();
 
   if (!state) {
     return (
@@ -16,10 +87,10 @@ const DetailLodging = () => {
     );
   }
 
-
-    return (
+  return (
     <div className="detail-lodging">
       <div className="container">
+        {/* 헤더 */}
         <div className="header">
           <div className="branding">
             <p className="branding-text">
@@ -32,22 +103,22 @@ const DetailLodging = () => {
               role="button"
               tabIndex={0}
               onClick={() => navigate("/")}
-              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && navigate("/")}
               style={{ cursor: "pointer" }}
             />
           </div>
           <div className="controls">
             <button className="search-top-btn" onClick={() => navigate("/")}>
               Let’s search!
-            </button> 
+            </button>
           </div>
         </div>
-        {/* ===== 상세 상단 탭 ===== */}
-<div className="detail-tabs">
-  <button className="pill pill--black">숙박</button>
-</div>
 
-{/* ===== 사진 + 상세 그리드 ===== */}
+        {/* 상단 탭 */}
+        <div className="detail-tabs">
+          <button className="pill pill--black">숙박</button>
+        </div>
+
+        {/* ===== 사진 + 상세 그리드 ===== */}
 <section className="detail-grid">
   {/* 좌측: 사진 카드 */}
   <div className="photo-card">
@@ -81,16 +152,18 @@ const DetailLodging = () => {
   </div>
   </div>
 </section>
-        <footer className="footer">
-          <p>
-            FIT ROOM<br />
-            <span className="footer-sub">_Finding a house that suits me</span>
-          </p>
-        </footer>
-      </div>
 
-</div>    
+        {/* 지도 */}
+        <section style={{ padding: "0 56px", marginTop: 28 }}>
+          <NaverMap lat={37.5666103} lng={126.9783882} />
+        </section>
+      <div className="footer-text">
+          FIT ROOM<br />
+          <span className="footer-sub">_Finding<br /> a house that suits me</span>
+        </div>  
+      </div>
+    </div>
   );
 };
 
-export default DetailLodging;  
+export default DetailLodging;
