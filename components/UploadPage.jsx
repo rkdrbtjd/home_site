@@ -4,8 +4,6 @@ import Header from "./Header";
 import "../styles/mainpage.css";
 import "../styles/UploadPage.css";
 
-import house from "../image/house.png";
-import search from "../image/search.png";
 import lodgingImg from "../image/image19.png";
 import transferImg from "../image/image21.png";
 import uploadImg from "../image/image32.png";
@@ -29,6 +27,38 @@ const API_BASE = process.env.REACT_APP_API_BASE ?? "http://localhost:5000";
 
 const UploadPage = () => {
   const navigate = useNavigate();
+
+   // ====== 🔎 메인/숙박과 동일한 검색 토글/폼 상태 ======
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const inputRef = useRef(null);
+  const searchBtnRef = useRef(null);
+
+  const toggleSearch = () => {
+    setSearchOpen((v) => {
+      const next = !v;
+      setTimeout(() => next && inputRef.current?.focus(), 0);
+      return next;
+    });
+  };
+  const submitSearch = () => {
+    const q = query.trim();
+    navigate(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
+  };
+
+  // 바깥 클릭 시 닫기 + 버튼 포커스 복귀
+  useEffect(() => {
+    const onDocMouseDown = (e) => {
+      if (!searchOpen) return;
+      const form = document.getElementById("uploadpage-top-search-form");
+      if (!form?.contains(e.target) && !searchBtnRef.current?.contains(e.target)) {
+        setSearchOpen(false);
+        searchBtnRef.current?.focus();
+      }
+    };
+    document.addEventListener("mousedown", onDocMouseDown);
+    return () => document.removeEventListener("mousedown", onDocMouseDown);
+  }, [searchOpen]);
 
   // 이미지 업로드
   const fileInputRef = useRef(null);
@@ -141,30 +171,43 @@ const UploadPage = () => {
   return (
     <div className="screen upload-page">
       <div className="container">
-        <div
-          className="search-button"
-          role="button"
-          tabIndex={0}
-          onClick={() => navigate("/search")}
-        >
-          <div className="search-label">Let’s search!</div>
+        <div className="top-search">
+          <button
+            ref={searchBtnRef}
+            className="top-search__toggle"
+            onClick={toggleSearch}
+            aria-expanded={searchOpen}
+            aria-controls="uploadpage-top-search-form"
+            type="button"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" fill="none" />
+              <line x1="16.5" y1="16.5" x2="22" y2="22" stroke="currentColor" strokeWidth="2" />
+            </svg>
+            <span className="top-search__label">검색</span>
+          </button>
+
+          <form
+            id="uploadpage-top-search-form"
+            role="search"
+            className={`top-search__form ${searchOpen ? "is-open" : ""}`}
+            aria-hidden={!searchOpen}
+            onSubmit={(e) => { e.preventDefault(); submitSearch(); }}
+          >
+            <input
+              ref={inputRef}
+              className="top-search__input"
+              placeholder="원룸/건물명 검색"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              aria-label="검색어 입력"
+              tabIndex={searchOpen ? 0 : -1}
+              onKeyDown={(e) => e.key === "Escape" && setSearchOpen(false)}
+            />
+          </form>
         </div>
-        <img
-          src={search}
-          alt="search"
-          className="search-icon"
-          onClick={() => navigate("/search")}
-        />
        {/* 공용 헤더 */}
               <Header />
-        <div className="header">
-          <h1 className="main-title">
-            FIT ROOM
-            <br />_Finding <br /> a house that suits me
-          </h1>
-          <img src={house} alt="house" className="house-image" />
-        </div>
-
         <div className="category-wrapper">
           <div className="category-card" onClick={() => navigate("/lodging")}>
             <img src={lodgingImg} alt="숙박" className="category-image" />
@@ -358,8 +401,7 @@ const UploadPage = () => {
           FIT ROOM
           <br />
           <span className="footer-sub">
-            _Finding
-            <br /> a house that suits me
+            _Finding a house that suits me
           </span>
         </div>
       </div>
