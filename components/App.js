@@ -19,6 +19,7 @@ function App() {
         <Route path="/upload" element={<UploadPage />} />
         <Route path="/detaillodging" element={<DetailLodging />} />
         <Route path="/detailtransfer" element={<DetailTransfer />} />
+
       </Routes>
     </Router>
   );
