@@ -75,8 +75,39 @@ function NaverMap({ lat, lng, zoom = 16, style }) {
 }
 
 const DetailTransfer = () => {
-  const navigate = useNavigate();       // ✅ 컴포넌트 최상위에서 호출
-  const { state } = useLocation();      // Transfer에서 넘긴 { img, summary }
+  const navigate = useNavigate();       
+  const { state } = useLocation(); 
+  
+  /* ── 🔎 메인페이지와 동일한 검색 토글/폼 상태 ── */
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [query, setQuery] = useState("");
+    const inputRef = useRef(null);
+    const searchBtnRef = useRef(null);
+  
+    const toggleSearch = () => {
+      setSearchOpen((v) => {
+        const next = !v;
+        setTimeout(() => next && inputRef.current?.focus(), 0);
+        return next;
+      });
+    };
+    const submitSearch = () => {
+      const q = query.trim();
+      navigate(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
+    };
+    // 바깥 클릭 시 닫기 + 버튼 포커스 복귀
+    useEffect(() => {
+      const onDocMouseDown = (e) => {
+        if (!searchOpen) return;
+        const form = document.getElementById("lodgingpage-top-search-form");
+        if (!form?.contains(e.target) && !searchBtnRef.current?.contains(e.target)) {
+          setSearchOpen(false);
+          searchBtnRef.current?.focus();
+        }
+      };
+      document.addEventListener("mousedown", onDocMouseDown);
+      return () => document.removeEventListener("mousedown", onDocMouseDown);
+    }, [searchOpen]);
 
   if (!state) {
     return (
@@ -106,11 +137,41 @@ const DetailTransfer = () => {
               style={{ cursor: "pointer" }}
             />
           </div>
-          <div className="controls">
-            <button className="search-top-btn" onClick={() => navigate("/")}>
-              Let’s search!
-            </button> 
-          </div>
+          <div className="top-search">
+          <button
+            ref={searchBtnRef}
+            className="top-search__toggle"
+            onClick={toggleSearch}
+            aria-expanded={searchOpen}
+            aria-controls="lodgingpage-top-search-form"
+            type="button"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" fill="none" />
+              <line x1="16.5" y1="16.5" x2="22" y2="22" stroke="currentColor" strokeWidth="2" />
+            </svg>
+            <span className="top-search__label">검색</span>
+          </button>
+
+          <form
+            id="lodgingpage-top-search-form"
+            role="search"
+            className={`top-search__form ${searchOpen ? "is-open" : ""}`}
+            aria-hidden={!searchOpen}
+            onSubmit={(e) => { e.preventDefault(); submitSearch(); }}
+          >
+            <input
+              ref={inputRef}
+              className="top-search__input"
+              placeholder="원룸/건물명 검색"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              aria-label="검색어 입력"
+              tabIndex={searchOpen ? 0 : -1}
+              onKeyDown={(e) => e.key === "Escape" && setSearchOpen(false)}
+            />
+          </form>
+        </div>
         </div>
         {/* ===== 상세 상단 탭 ===== */}
 <div className="detail-tabs">
