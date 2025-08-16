@@ -108,6 +108,17 @@ export default function MainPage() {
   const goPrev = () => setIndex((i) => Math.max(0, i - 1));
   const goNext = () => setIndex((i) => Math.min(maxIndex, i + 1));
 
+  const goDetailFromMain = (item) => {
+  if (item.category === "lodging") {
+    // ✅ 라우터가 /lodging/detail/:id 라면
+    navigate("/detaillodging", { state: { summary: item.label } });
+  } else {
+    // ✅ 라우터가 /transfer/detail/:id 라면
+    navigate("/detailtransfer", { state: { summary: item.label } });
+  }
+};
+
+
   return (
     <div className="screen">
       <div className="container">
@@ -270,6 +281,10 @@ export default function MainPage() {
                       marginRight: i === displayList.length - 1 ? 0 : GAP,
                       height: cardH + 40,
                     }}
+                    onClick={() => goDetailFromMain(item)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => (e.key === "Enter" || e.key === " " ? goDetailFromMain(item) : null)}
                   >
                     <div className="carousel__thumb" style={{ height: cardH }}>
                       <div className="carousel__badge">{i + 1}</div>
